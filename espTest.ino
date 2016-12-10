@@ -3,7 +3,7 @@
 
 #define SSID "R1 HD "
 #define PSWD "12345678"
-#define URI "http://api.humandroid.us/marwell-api/add"
+#define URI "http://api.humandroid.us/milk-api/add"
 #define CONTENT_TYPE "application/json"
 #define MAX_NO_MILK_VAL 100
 #define UPPER_OFFSET  0
@@ -17,10 +17,10 @@ enum STAGES
 };
 enum STATES
 {
-  NOINIT, MILK_FINISHED,MILK_REQUIRED,MILK_NOT_REQ
+  NOINIT, MILK_FINISHED,MILK_REQUIRED,MILK_NOT_REQ,NO_BOTTLE
 };
                  //_X100     _X70      _X50      _X20      _X0     _XX 
-int lookup[] = {800, 520, 499, 480, 465, 445, 370, 300, 150, 80, 70, 0};
+int lookup[] = {800, 595, 475, 555, 535, 515, 440, 370, 225, 155, 145, 0};
 float capacities[] = {3.78,2.78,1.78,0.78, 0.0};
 
 HTTPClient http;
@@ -71,27 +71,27 @@ bool sendPostRequest(String json)
 float findCapacity(int sensorValue)
 {
    float literValue = 0.0;
-   if (sensorValue >= 520 )
+   if (sensorValue >= 530 )
    {
         literValue = capacities[_X100];
         state = MILK_NOT_REQ;
    }
-   else if (sensorValue >= 480)
+   else if (sensorValue >= 490)
    {
         literValue = capacities[_X70];
         state = MILK_NOT_REQ;
    }
-   else if (sensorValue >= 445 )
+   else if (sensorValue >= 430 )
    {
         literValue = capacities[_X50];
         state = MILK_NOT_REQ;
    }
-   else if (sensorValue >= 300)
+   else if (sensorValue >= 280)
    {
         literValue = capacities[_X20];
         state = MILK_REQUIRED;
    }
-   else if (sensorValue >= 80)
+   else if (sensorValue >= 155)
    {
         literValue = capacities[_X0];
         state = MILK_FINISHED;
@@ -122,6 +122,7 @@ void setup()
       //Bottle Not Present
       Serial.print(".");
       delay(500);
+      sensorValue = analogRead(A0);
     }
     Serial.println();
 }
@@ -147,13 +148,13 @@ void loop()
            sendPostRequest(json);
         }
     }
-    else
+    else if (bottleCapacity > -1)
     {
         Serial.println("Sending Values...");
         String json = createJson(sensorValue, bottleCapacity);
         sendPostRequest(json);
     }
 
-   delay(45000);
+   delay(20000);
   
 }
